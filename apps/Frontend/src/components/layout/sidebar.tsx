@@ -61,7 +61,7 @@ export function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps) {
             </svg>
           </div>
           <div>
-            <h1 className="text-base font-semibold text-gray-900">Dental Connect</h1>
+            <h1 className="text-base font-semibold text-gray-900">Dental Manager</h1>
             <p className="text-xs text-gray-500">Clinic Management</p>
           </div>
         </div>
@@ -87,7 +87,7 @@ export function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps) {
         </nav>
 
         <div className="p-4 border-t border-gray-200">
-          <p className="text-xs text-gray-400 text-center">Dental Connect v1.0</p>
+          <p className="text-xs text-gray-400 text-center">Dental Manager v1.0</p>
         </div>
       </div>
     </>

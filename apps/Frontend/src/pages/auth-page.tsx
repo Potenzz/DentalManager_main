@@ -102,7 +102,7 @@ export default function AuthPage() {
                 </svg>
               </div>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-1">Dental Connect</h1>
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">Dental Manager</h1>
             <p className="text-gray-500 text-sm">Clinic Management System</p>
           </div>
 
@@ -272,7 +272,7 @@ export default function AuthPage() {
 
         {/* Hero Section */}
         <div className="hidden md:flex bg-primary p-8 text-white flex-col justify-center">
-          <h2 className="text-2xl font-bold mb-3">Welcome to Dental Connect</h2>
+          <h2 className="text-2xl font-bold mb-3">Welcome to Dental Manager</h2>
           <p className="mb-8 text-white/80 text-sm leading-relaxed">
             Streamline your dental clinic workflows. Manage appointments, patient records, staff, and treatment history all in one place.
           </p>

@@ -39,7 +39,7 @@ export function TopAppBar({ toggleMobileMenu }: TopAppBarProps) {
           >
             <Menu className="h-5 w-5" />
           </Button>
-          <h1 className="md:hidden text-base font-semibold text-primary">Dental Connect</h1>
+          <h1 className="md:hidden text-base font-semibold text-primary">Dental Manager</h1>
         </div>
 
         <div className="hidden md:flex md:flex-1" />

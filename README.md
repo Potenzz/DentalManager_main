@@ -1,6 +1,6 @@
-# Dental Connect - Starter 
+# Dental Manager - Starter 
 
-A monorepo setup to manage both Backend and Frontend of the Dental Connectnpm  application.
+A monorepo setup to manage both Backend and Frontend of the Dental Manager application.
 
 ## 🚀 Getting Started
 
