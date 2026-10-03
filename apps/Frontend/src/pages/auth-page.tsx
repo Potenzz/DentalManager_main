@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent } from "@/components/ui/card";
-import { BriefcaseMedical, CheckCircle, Torus } from "lucide-react";
+import { CheckCircle, Calendar, Users, Shield } from "lucide-react";
 import { CheckedState } from "@radix-ui/react-checkbox";
 
 const insertUserSchema = (UserUncheckedCreateInputObjectSchema as unknown as z.ZodObject<any>).pick({
@@ -49,7 +49,7 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 export default function AuthPage() {
   const [activeTab, setActiveTab] = useState<string>("login");
   const { user, loginMutation, registerMutation } = useAuth();
-  
+
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -83,19 +83,27 @@ export default function AuthPage() {
     });
   };
 
-  // Redirect if already logged in
   if (user) {
     return <Redirect to="/" />;
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 shadow-lg rounded-lg overflow-hidden">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 shadow-xl rounded-xl overflow-hidden">
         {/* Auth Forms */}
-        <Card className="p-6 bg-white">
-          <div className="mb-10 text-center">
-            <h1 className="text-3xl font-medium text-primary mb-2">DentalConnect</h1>
-            <p className="text-gray-600">Patient Management System</p>
+        <Card className="p-6 bg-white border-0 rounded-none">
+          <div className="mb-8 text-center">
+            <div className="flex justify-center mb-3">
+              <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
+                  <path d="M12 14c-1.65 0-3-1.35-3-3V5c0-1.65 1.35-3 3-3s3 1.35 3 3v6c0 1.65-1.35 3-3 3Z" />
+                  <path d="M19 14v-4a7 7 0 0 0-14 0v4" />
+                  <path d="M12 19c-5 0-8-2-9-5.5m18 0c-1 3.5-4 5.5-9 5.5Z" />
+                </svg>
+              </div>
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">Dental Connect</h1>
+            <p className="text-gray-500 text-sm">Clinic Management System</p>
           </div>
 
           <Tabs defaultValue="login" value={activeTab} onValueChange={setActiveTab}>
@@ -132,7 +140,7 @@ export default function AuthPage() {
                         <FormLabel>Password</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="••••••••"
+                            placeholder="Enter your password"
                             type="password"
                             {...field}
                           />
@@ -202,7 +210,7 @@ export default function AuthPage() {
                         <FormLabel>Password</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="••••••••"
+                            placeholder="Create a password"
                             type="password"
                             {...field}
                           />
@@ -220,7 +228,7 @@ export default function AuthPage() {
                         <FormLabel>Confirm Password</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="••••••••"
+                            placeholder="Confirm your password"
                             type="password"
                             {...field}
                             value={typeof field.value === 'string' ? field.value : ''}
@@ -263,32 +271,47 @@ export default function AuthPage() {
         </Card>
 
         {/* Hero Section */}
-        <div className="md:block bg-primary p-8 text-white flex flex-col justify-center">
-          <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-white bg-opacity-10 rounded-full flex items-center justify-center">
-              <Torus className="h-8 w-8" />
-            </div>
-          </div>
-          <h2 className="text-2xl font-bold mb-4 text-center">Welcome to DentalConnect</h2>
-          <p className="mb-6 text-center text-white text-opacity-80">
-            The complete solution for dental practice management. Streamline your patient records, appointments, and more.
+        <div className="hidden md:flex bg-primary p-8 text-white flex-col justify-center">
+          <h2 className="text-2xl font-bold mb-3">Welcome to Dental Connect</h2>
+          <p className="mb-8 text-white/80 text-sm leading-relaxed">
+            Streamline your dental clinic workflows. Manage appointments, patient records, staff, and treatment history all in one place.
           </p>
           <ul className="space-y-4">
-            <li className="flex items-center">
-              <CheckCircle className="h-5 w-5 mr-2 text-white text-opacity-80" />
-              <span>Easily manage patient records</span>
+            <li className="flex items-start space-x-3">
+              <div className="mt-0.5 h-8 w-8 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
+                <Calendar className="h-4 w-4" />
+              </div>
+              <div>
+                <span className="font-medium text-sm">Appointment Scheduling</span>
+                <p className="text-xs text-white/70 mt-0.5">Schedule and track patient visits with ease</p>
+              </div>
             </li>
-            <li className="flex items-center">
-              <CheckCircle className="h-5 w-5 mr-2 text-white text-opacity-80" />
-              <span>Track patient insurance information</span>
+            <li className="flex items-start space-x-3">
+              <div className="mt-0.5 h-8 w-8 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
+                <Users className="h-4 w-4" />
+              </div>
+              <div>
+                <span className="font-medium text-sm">Patient Management</span>
+                <p className="text-xs text-white/70 mt-0.5">Complete patient records and medical history</p>
+              </div>
             </li>
-            <li className="flex items-center">
-              <CheckCircle className="h-5 w-5 mr-2 text-white text-opacity-80" />
-              <span>Secure and compliant data storage</span>
+            <li className="flex items-start space-x-3">
+              <div className="mt-0.5 h-8 w-8 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
+                <Shield className="h-4 w-4" />
+              </div>
+              <div>
+                <span className="font-medium text-sm">Secure & Compliant</span>
+                <p className="text-xs text-white/70 mt-0.5">JWT authentication and data validation</p>
+              </div>
             </li>
-            <li className="flex items-center">
-              <CheckCircle className="h-5 w-5 mr-2 text-white text-opacity-80" />
-              <span>Simple and intuitive interface</span>
+            <li className="flex items-start space-x-3">
+              <div className="mt-0.5 h-8 w-8 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
+                <CheckCircle className="h-4 w-4" />
+              </div>
+              <div>
+                <span className="font-medium text-sm">Simple Interface</span>
+                <p className="text-xs text-white/70 mt-0.5">Intuitive design for clinic staff</p>
+              </div>
             </li>
           </ul>
         </div>

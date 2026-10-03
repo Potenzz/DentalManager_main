@@ -19,7 +19,7 @@ import {
   Users,
   Calendar,
   CheckCircle,
-  CreditCard,
+  UserCog,
   Plus,
   Clock,
 } from "lucide-react";
@@ -34,7 +34,6 @@ import {
 import { z } from "zod";
 import { DeleteConfirmationDialog } from "@/components/ui/deleteDialog";
 
-//creating types out of schema auto generated.
 type Appointment = z.infer<typeof AppointmentUncheckedCreateInputObjectSchema>;
 
 const insertAppointmentSchema = (
@@ -82,7 +81,6 @@ const updatePatientSchema = (
 
 type UpdatePatient = z.infer<typeof updatePatientSchema>;
 
-// Type for the ref to access modal methods
 type AddPatientModalRef = {
   shouldSchedule: boolean;
   navigateToSchedule: (patientId: number) => void;
@@ -105,7 +103,6 @@ export default function Dashboard() {
   const { user } = useAuth();
   const addPatientModalRef = useRef<AddPatientModalRef | null>(null);
 
-  // Fetch patients
   const { data: patients = [], isLoading: isLoadingPatients } = useQuery<
     Patient[]
   >({
@@ -117,7 +114,6 @@ export default function Dashboard() {
     enabled: !!user,
   });
 
-  // Fetch appointments
   const {
     data: appointments = [] as Appointment[],
     isLoading: isLoadingAppointments,
@@ -130,7 +126,15 @@ export default function Dashboard() {
     enabled: !!user,
   });
 
-  // Add patient mutation
+  const { data: staffMembers = [] } = useQuery<any[]>({
+    queryKey: ["/api/staffs/"],
+    queryFn: async () => {
+      const res = await apiRequest("GET", "/api/staffs/");
+      return res.json();
+    },
+    enabled: !!user,
+  });
+
   const addPatientMutation = useMutation({
     mutationFn: async (patient: InsertPatient) => {
       const res = await apiRequest("POST", "/api/patients/", patient);
@@ -158,7 +162,6 @@ export default function Dashboard() {
     },
   });
 
-  // Update patient mutation
   const updatePatientMutation = useMutation({
     mutationFn: async ({
       id,
@@ -274,7 +277,6 @@ export default function Dashboard() {
     addPatientMutation.isPending ||
     updatePatientMutation.isPending;
 
-  // Create appointment mutation
   const createAppointmentMutation = useMutation({
     mutationFn: async (appointment: InsertAppointment) => {
       const res = await apiRequest("POST", "/api/appointments/", appointment);
@@ -286,7 +288,6 @@ export default function Dashboard() {
         title: "Success",
         description: "Appointment created successfully.",
       });
-      // Invalidate both appointments and patients queries
       queryClient.invalidateQueries({ queryKey: ["/api/appointments/all"] });
       queryClient.invalidateQueries({ queryKey: ["/api/patients/"] });
     },
@@ -299,7 +300,6 @@ export default function Dashboard() {
     },
   });
 
-  // Update appointment mutation
   const updateAppointmentMutation = useMutation({
     mutationFn: async ({
       id,
@@ -321,7 +321,6 @@ export default function Dashboard() {
         title: "Success",
         description: "Appointment updated successfully.",
       });
-      // Invalidate both appointments and patients queries
       queryClient.invalidateQueries({ queryKey: ["/api/appointments/all"] });
       queryClient.invalidateQueries({ queryKey: ["/api/patients/"] });
     },
@@ -334,7 +333,6 @@ export default function Dashboard() {
     },
   });
 
-  // Handle appointment submission (create or update)
   const handleAppointmentSubmit = (
     appointmentData: InsertAppointment | UpdateAppointment
   ) => {
@@ -353,7 +351,6 @@ export default function Dashboard() {
     }
   };
 
-  // Since we removed filters, just return all patients
   const filteredPatients = patients;
   const now = new Date();
   const todayUTC = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}-${String(now.getUTCDate()).padStart(2, "0")}`;
@@ -364,7 +361,6 @@ export default function Dashboard() {
         ? parseISO(appointment.date)
         : appointment.date;
 
-    // Extract UTC year, month, day from appointment date
     const year = dateObj.getUTCFullYear();
     const month = dateObj.getUTCMonth();
     const day = dateObj.getUTCDate();
@@ -374,13 +370,12 @@ export default function Dashboard() {
     return appointmentUTCDate === todayUTC;
   });
 
-  // Count completed appointments today
   const completedTodayCount = todaysAppointments.filter((appointment) => {
     return appointment.status === "completed";
   }).length;
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-100">
+    <div className="flex h-screen overflow-hidden bg-gray-50">
       <Sidebar
         isMobileOpen={isMobileMenuOpen}
         setIsMobileOpen={setIsMobileMenuOpen}
@@ -389,9 +384,19 @@ export default function Dashboard() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <TopAppBar toggleMobileMenu={toggleMobileMenu} />
 
-        <main className="flex-1 overflow-y-auto p-4">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6">
+          {/* Welcome Header */}
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-gray-900">
+              Welcome back{user?.username ? `, ${user.username}` : ""}
+            </h1>
+            <p className="text-gray-500 text-sm mt-1">
+              Here's an overview of your dental practice today.
+            </p>
+          </div>
+
           {/* Quick Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <StatCard
               title="Total Patients"
               value={patients.length}
@@ -402,29 +407,30 @@ export default function Dashboard() {
               title="Today's Appointments"
               value={todaysAppointments.length}
               icon={Calendar}
-              color="secondary"
+              color="teal"
             />
             <StatCard
               title="Completed Today"
               value={completedTodayCount}
               icon={CheckCircle}
-              color="success"
+              color="green"
             />
             <StatCard
-              title="Pending Payments"
-              value={0}
-              icon={CreditCard}
-              color="warning"
+              title="Staff Members"
+              value={staffMembers.length}
+              icon={UserCog}
+              color="violet"
             />
           </div>
 
           {/* Today's Appointments Section */}
           <div className="flex flex-col space-y-4 mb-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-              <h2 className="text-xl font-medium text-gray-800">
+              <h2 className="text-lg font-semibold text-gray-900">
                 Today's Appointments
               </h2>
               <Button
+                size="sm"
                 className="mt-2 md:mt-0"
                 onClick={() => {
                   setSelectedAppointment(undefined);
@@ -436,7 +442,7 @@ export default function Dashboard() {
               </Button>
             </div>
 
-            <Card>
+            <Card className="shadow-sm">
               <CardContent className="p-0">
                 {todaysAppointments.length > 0 ? (
                   <div className="divide-y">
@@ -447,39 +453,37 @@ export default function Dashboard() {
                       return (
                         <div
                           key={appointment.id}
-                          className="p-4 flex items-center justify-between"
+                          className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
                         >
                           <div className="flex items-center space-x-4">
-                            <div className="h-10 w-10 rounded-full bg-opacity-10 text-primary flex items-center justify-center">
+                            <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center">
                               <Clock className="h-5 w-5" />
                             </div>
                             <div>
-                              <h3 className="font-medium">
+                              <h3 className="font-medium text-gray-900">
                                 {patient
                                   ? `${patient.firstName} ${patient.lastName}`
                                   : "Unknown Patient"}
                               </h3>
                               <div className="text-sm text-gray-500 flex items-center space-x-2">
                                 <span>
-                                  <span>
-                                    {`${format(
-                                      parse(
-                                        `${format(new Date(appointment.date), "yyyy-MM-dd")} ${appointment.startTime}`,
-                                        "yyyy-MM-dd HH:mm",
-                                        new Date()
-                                      ),
-                                      "hh:mm a"
-                                    )} - ${format(
-                                      parse(
-                                        `${format(new Date(appointment.date), "yyyy-MM-dd")} ${appointment.endTime}`,
-                                        "yyyy-MM-dd HH:mm",
-                                        new Date()
-                                      ),
-                                      "hh:mm a"
-                                    )}`}
-                                  </span>
+                                  {`${format(
+                                    parse(
+                                      `${format(new Date(appointment.date), "yyyy-MM-dd")} ${appointment.startTime}`,
+                                      "yyyy-MM-dd HH:mm",
+                                      new Date()
+                                    ),
+                                    "hh:mm a"
+                                  )} - ${format(
+                                    parse(
+                                      `${format(new Date(appointment.date), "yyyy-MM-dd")} ${appointment.endTime}`,
+                                      "yyyy-MM-dd HH:mm",
+                                      new Date()
+                                    ),
+                                    "hh:mm a"
+                                  )}`}
                                 </span>
-                                <span>•</span>
+                                <span className="text-gray-300">|</span>
                                 <span>
                                   {appointment.type.charAt(0).toUpperCase() +
                                     appointment.type.slice(1)}
@@ -487,17 +491,17 @@ export default function Dashboard() {
                               </div>
                             </div>
                           </div>
-                          <div className="flex items-center space-x-2">
+                          <div className="flex items-center space-x-3">
                             <span
                               className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                               ${
                                 appointment.status === "completed"
-                                  ? "bg-green-100 text-green-800"
+                                  ? "bg-green-50 text-green-700 ring-1 ring-green-600/20"
                                   : appointment.status === "cancelled"
-                                    ? "bg-red-100 text-red-800"
+                                    ? "bg-red-50 text-red-700 ring-1 ring-red-600/20"
                                     : appointment.status === "confirmed"
-                                      ? "bg-blue-100 text-blue-800"
-                                      : "bg-yellow-100 text-yellow-800"
+                                      ? "bg-blue-50 text-blue-700 ring-1 ring-blue-600/20"
+                                      : "bg-amber-50 text-amber-700 ring-1 ring-amber-600/20"
                               }`}
                             >
                               {appointment.status
@@ -507,7 +511,7 @@ export default function Dashboard() {
                             </span>
                             <Link
                               to="/appointments"
-                              className="text-primary hover:text-primary/80 text-sm"
+                              className="text-primary hover:text-primary/80 text-sm font-medium"
                             >
                               View All
                             </Link>
@@ -517,15 +521,16 @@ export default function Dashboard() {
                     })}
                   </div>
                 ) : (
-                  <div className="p-6 text-center">
-                    <Calendar className="h-12 w-12 mx-auto text-gray-400 mb-2" />
-                    <h3 className="text-lg font-medium text-gray-900">
+                  <div className="p-8 text-center">
+                    <Calendar className="h-12 w-12 mx-auto text-gray-300 mb-3" />
+                    <h3 className="text-base font-medium text-gray-900">
                       No appointments today
                     </h3>
-                    <p className="mt-1 text-gray-500">
+                    <p className="mt-1 text-sm text-gray-500">
                       You don't have any appointments scheduled for today.
                     </p>
                     <Button
+                      size="sm"
                       className="mt-4"
                       onClick={() => {
                         setSelectedAppointment(undefined);
@@ -543,12 +548,12 @@ export default function Dashboard() {
 
           {/* Patient Management Section */}
           <div className="flex flex-col space-y-4">
-            {/* Patient Header */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-              <h2 className="text-xl font-medium text-gray-800">
-                Patient Management
+              <h2 className="text-lg font-semibold text-gray-900">
+                Recent Patients
               </h2>
               <Button
+                size="sm"
                 className="mt-2 md:mt-0"
                 onClick={() => {
                   setCurrentPatient(undefined);
@@ -560,7 +565,6 @@ export default function Dashboard() {
               </Button>
             </div>
 
-            {/* Patient Table */}
             <PatientTable
               patients={filteredPatients}
               onEdit={handleEditPatient}
@@ -622,7 +626,6 @@ export default function Dashboard() {
                   </h4>
                   <div className="mt-2 space-y-2">
                     <p>
-                      <span className="text-gray-500">Date of Birth:</span>{" "}
                       <span className="text-gray-500">Date of Birth:</span>{" "}
                       {format(
                         parse(

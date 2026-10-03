@@ -693,7 +693,7 @@ export default function AppointmentsPage() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-100">
+    <div className="flex h-screen overflow-hidden bg-gray-50">
       <Sidebar
         isMobileOpen={isMobileMenuOpen}
         setIsMobileOpen={setIsMobileMenuOpen}

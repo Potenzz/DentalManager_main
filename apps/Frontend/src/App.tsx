@@ -12,6 +12,7 @@ import LoadingScreen from "./components/ui/LoadingScreen";
 const AuthPage = lazy(() => import("./pages/auth-page"));
 const AppointmentsPage = lazy(() => import("./pages/appointments-page"));
 const PatientsPage = lazy(() => import("./pages/patients-page"));
+const StaffPage = lazy(() => import("./pages/staff-page"));
 const SettingsPage = lazy(() => import("./pages/settings-page"));
 const NotFound = lazy(() => import("./pages/not-found"));
 
@@ -21,6 +22,7 @@ function Router() {
       <ProtectedRoute path="/" component={() => <Dashboard />} />
       <ProtectedRoute path="/appointments" component={() => <AppointmentsPage />} />
       <ProtectedRoute path="/patients" component={() => <PatientsPage />} />
+      <ProtectedRoute path="/staff" component={() => <StaffPage />} />
       <ProtectedRoute path="/settings" component={() => <SettingsPage />} />
       <Route path="/auth" component={() => <AuthPage />} />
       <Route component={() => <NotFound />} />
